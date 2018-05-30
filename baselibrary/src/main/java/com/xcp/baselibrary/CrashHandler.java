@@ -86,10 +86,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 
         if (!handleException(ex) && mDefaultHandler != null) {
             //如果用户没有处理则让系统默认的异常处理器来处理
-            Log.e("TAG", "进入if里面====");
+//            Log.e("TAG", "进入if里面====");
             mDefaultHandler.uncaughtException(thread, ex);
         } else {
-            Log.e("TAG", "进入else里面了===");
+//            Log.e("TAG", "进入else里面了===");
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
@@ -188,9 +188,9 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             String fileName = "crash-" + time + "-" + timestamp + ".log";
             String path;
             if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                path = mContext.getExternalFilesDir(null).getAbsolutePath();
+                path = mContext.getExternalFilesDir(null).getAbsolutePath()+File.separator+"crash";
             } else {
-                path = mContext.getFilesDir().getAbsolutePath();
+                path = mContext.getFilesDir().getAbsolutePath()+File.separator+"crash";
             }
             //避开运行时权限处理还可以这么做
 //            方式1：File dir2=new File(mContext.getExternalCacheDir(),fileName);
@@ -225,7 +225,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 //                }
 //            }
             File dir = new File(path);
-
             // 先删除之前的异常信息
             if (dir.exists()) {
                 // 删除该目录下的所有子文件
@@ -235,10 +234,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            FileOutputStream fos = new FileOutputStream(path + fileName);
+            FileOutputStream fos = new FileOutputStream(path + File.separator + fileName);
             fos.write(sb.toString().getBytes());
             //发送给开发人员
-            sendCrashLog2PM(path + fileName);
+            sendCrashLog2PM(path + File.separator + fileName);
             fos.close();
             return fileName;
         } catch (Exception e) {
@@ -254,7 +253,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
      */
     private void sendCrashLog2PM(String fileName) {
         if (!new File(fileName).exists()) {
-            Toast.makeText(mContext, "日志文件不存在！", Toast.LENGTH_SHORT).show();
+            Log.e("TAG", "日志文件不存在!");
             return;
         }
         FileInputStream fis = null;
@@ -309,18 +308,18 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
      * @return
      */
     public File getCrashFile() {
-        long timestamp = System.currentTimeMillis();
-        String time = formatter.format(new Date());
-        String fileName = "crash-" + time + "-" + timestamp + ".log";
         String path;
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            path = mContext.getExternalFilesDir(null).getAbsolutePath();
+            path = mContext.getExternalFilesDir(null).getAbsolutePath()+File.separator+"crash";
         } else {
-            path = mContext.getFilesDir().getAbsolutePath();
+            path = mContext.getFilesDir().getAbsolutePath()+File.separator+"crash";
         }
-        File file = new File(path + fileName);
-        if (file.exists()) {
-            return file;
+        File dir = new File(path);
+        if (dir.isDirectory()) {
+            File[] children = dir.listFiles();
+            if (children != null && children.length > 0) {
+                return children[0];//返回第一个，其实也是唯一一个
+            }
         }
         return null;
     }

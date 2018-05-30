@@ -1,23 +1,29 @@
 package com.xcp.neihan;
 
+import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xcp.baselibrary.ioc.BindView;
-import com.xcp.baselibrary.ioc.CheckNet;
-import com.xcp.baselibrary.ioc.OnClick;
 import com.xcp.framelibrary.SkinBaseActivity;
+
+import java.io.File;
+import java.io.IOException;
 
 public class MainActivity extends SkinBaseActivity {
 
     @BindView(R.id.tv_hello)
     TextView tvHello;
 
-
     @Override
     protected void initListener() {
-
+        tvHello.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               Toast.makeText(MainActivity.this, 2/0+"==", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -36,6 +42,22 @@ public class MainActivity extends SkinBaseActivity {
 
         //}
 
+        String path;
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            path = getExternalFilesDir(null).getAbsolutePath();
+        } else {
+            path = getFilesDir().getAbsolutePath();
+        }
+        File file=new File(path,"fix.apatch");
+        if(file.exists()) {
+            try {
+                ((MyApplication)getApplication()).patchManager.addPatch(file.getAbsolutePath());
+                Toast.makeText(MainActivity.this, "修复成功", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(MainActivity.this, "修复失败", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -43,14 +65,14 @@ public class MainActivity extends SkinBaseActivity {
         return R.layout.activity_main;
     }
 
-    @OnClick({R.id.tv_hello})
-    @CheckNet
-    private void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.tv_hello:
-                Toast.makeText(MainActivity.this, "注解点击事件生效", Toast.LENGTH_SHORT).show();
-                break;
-        }
-
-    }
+//    @OnClick({R.id.tv_hello})
+//    @CheckNet
+//    private void onClick(View view) {
+//        switch (view.getId()) {
+//            case R.id.tv_hello:
+//                Toast.makeText(MainActivity.this, "注解点击事件生效", Toast.LENGTH_SHORT).show();
+//                break;
+//        }
+//
+//    }
 }
