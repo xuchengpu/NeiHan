@@ -1,4 +1,4 @@
-package com.xcp.baselibrary;
+package com.xcp.baselibrary.base;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

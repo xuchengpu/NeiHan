@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.view.View;
 import android.widget.Toast;
 
-import com.xcp.baselibrary.NetUtis;
+import com.xcp.baselibrary.utils.NetUtis;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

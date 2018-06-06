@@ -1,6 +1,6 @@
 package com.xcp.framelibrary;
 
-import com.xcp.baselibrary.BaseActivity;
+import com.xcp.baselibrary.base.BaseActivity;
 
 /**
  * Created by 许成谱 on 2018/5/29 10:20.

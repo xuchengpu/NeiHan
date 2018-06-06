@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xcp.baselibrary.fix.FixManager;
 import com.xcp.baselibrary.ioc.BindView;
 import com.xcp.framelibrary.SkinBaseActivity;
 
@@ -21,7 +22,7 @@ public class MainActivity extends SkinBaseActivity {
         tvHello.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               Toast.makeText(MainActivity.this, 2/0+"==", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, 2 / 0 + "==", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -42,16 +43,52 @@ public class MainActivity extends SkinBaseActivity {
 
         //}
 
+//        andFix();
+
+        customFix();
+
+
+    }
+
+    /**
+     * 自定义热修复
+     */
+    private void customFix() {
         String path;
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             path = getExternalFilesDir(null).getAbsolutePath();
         } else {
             path = getFilesDir().getAbsolutePath();
         }
-        File file=new File(path,"fix.apatch");
-        if(file.exists()) {
+        File fixFile = new File(path, "fix.dex");
+
+        if (fixFile.exists()) {
+
             try {
-                ((MyApplication)getApplication()).patchManager.addPatch(file.getAbsolutePath());
+                FixManager manager=new FixManager(this);
+                manager.fixBug(fixFile.getAbsolutePath());
+                Toast.makeText(MainActivity.this, "修复成功", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(MainActivity.this, "修复失败", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    /**
+     * 阿里andFix热修复
+     */
+    private void andFix() {
+        String path;
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            path = getExternalFilesDir(null).getAbsolutePath();
+        } else {
+            path = getFilesDir().getAbsolutePath();
+        }
+        File file = new File(path, "fix.apatch");
+        if (file.exists()) {
+            try {
+                ((MyApplication) getApplication()).patchManager.addPatch(file.getAbsolutePath());
                 Toast.makeText(MainActivity.this, "修复成功", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 e.printStackTrace();
