@@ -1,12 +1,17 @@
 package com.xcp.neihan;
 
 import android.os.Environment;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xcp.baselibrary.dialog.AlertDialog;
 import com.xcp.baselibrary.fix.FixManager;
 import com.xcp.baselibrary.ioc.BindView;
+import com.xcp.baselibrary.utils.UIUtils;
 import com.xcp.framelibrary.SkinBaseActivity;
 
 import java.io.File;
@@ -22,9 +27,35 @@ public class MainActivity extends SkinBaseActivity {
         tvHello.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, 2 / 0 + "==", Toast.LENGTH_SHORT).show();
+               showMyDialog();
             }
         });
+    }
+
+    private void showMyDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setContentView(R.layout.detail_comment_dialog)
+                .setText(R.id.submit_btn, "接收")
+                .setOnClickListener(R.id.account_icon_weibo, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(MainActivity.this, "点击了星朗微博", Toast.LENGTH_SHORT).show();
+                    }
+                })
+//                .setFullWidth()
+                .setLayoutParams(UIUtils.dp2px(getApplicationContext(), 300), ViewGroup.LayoutParams.WRAP_CONTENT)
+                .setGravity(Gravity.BOTTOM)
+//                .setFromBottomAnimation()
+                .show();
+        final EditText contentView = dialog.getViewById(R.id.comment_editor);
+        dialog.setOnClickListener(R.id.submit_btn, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, contentView.getText().toString().trim()+"---哈哈哈", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
     @Override
@@ -45,7 +76,7 @@ public class MainActivity extends SkinBaseActivity {
 
 //        andFix();
 
-        customFix();
+//        customFix();
 
 
     }

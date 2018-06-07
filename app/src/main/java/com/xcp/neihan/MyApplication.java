@@ -1,11 +1,9 @@
 package com.xcp.neihan;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.alipay.euler.andfix.patch.PatchManager;
 import com.xcp.baselibrary.CrashHandler;
-import com.xcp.baselibrary.fix.FixManager;
 
 /**
  * Created by 许成谱 on 2018/5/29 18:48.
@@ -31,13 +29,13 @@ public class MyApplication extends Application {
         }
         patchManager.loadPatch();*/
         //自己的热修复,初始化用于把以前的补丁包全部修复
-        try {
+        /*try {
             FixManager manager=new FixManager(this);
             manager.loadFixDexs();
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("TAG", "e"+e.getMessage());
-        }
+        }*/
 
     }
 }
