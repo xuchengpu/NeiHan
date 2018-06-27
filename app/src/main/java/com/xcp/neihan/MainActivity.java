@@ -1,6 +1,7 @@
 package com.xcp.neihan;
 
 import android.os.Environment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +11,14 @@ import android.widget.Toast;
 
 import com.xcp.baselibrary.dialog.AlertDialog;
 import com.xcp.baselibrary.fix.FixManager;
+import com.xcp.baselibrary.http.HttpCallBack;
+import com.xcp.baselibrary.http.HttpUtils;
+import com.xcp.baselibrary.http.OkHttpEngine;
 import com.xcp.baselibrary.ioc.BindView;
 import com.xcp.baselibrary.utils.UIUtils;
+import com.xcp.framelibrary.DefaultTitleBar;
 import com.xcp.framelibrary.SkinBaseActivity;
+import com.xcp.neihan.api.Constants;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +33,7 @@ public class MainActivity extends SkinBaseActivity {
         tvHello.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               showMyDialog();
+                showMyDialog();
             }
         });
     }
@@ -51,16 +57,34 @@ public class MainActivity extends SkinBaseActivity {
         dialog.setOnClickListener(R.id.submit_btn, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, contentView.getText().toString().trim()+"---哈哈哈", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, contentView.getText().toString().trim() + "---哈哈哈", Toast.LENGTH_SHORT).show();
             }
         });
-
 
     }
 
     @Override
     protected void initData() {
         tvHello.setText("ioc注解");
+        getDataFromNet();
+    }
+
+    private void getDataFromNet() {
+        HttpUtils.with(this)
+                .url(Constants.HOME_URL)
+                .get()
+                .setEngine(new OkHttpEngine())
+                .execute(new HttpCallBack() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("TAG", "HttpUtils请求失败了");
+                    }
+
+                    @Override
+                    public void onSuccess(String response) {
+                        Log.e("TAG", "HttpUtils请求成功了");
+                    }
+                });
     }
 
     @Override
@@ -77,8 +101,13 @@ public class MainActivity extends SkinBaseActivity {
 //        andFix();
 
 //        customFix();
+        initToolbar();
+    }
 
-
+    private void initToolbar() {
+        new DefaultTitleBar.Builder(this)
+                .setTitle("内涵段子")
+                .create();
     }
 
     /**
@@ -96,7 +125,7 @@ public class MainActivity extends SkinBaseActivity {
         if (fixFile.exists()) {
 
             try {
-                FixManager manager=new FixManager(this);
+                FixManager manager = new FixManager(this);
                 manager.fixBug(fixFile.getAbsolutePath());
                 Toast.makeText(MainActivity.this, "修复成功", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
