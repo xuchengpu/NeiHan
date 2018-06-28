@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.alipay.euler.andfix.patch.PatchManager;
 import com.xcp.baselibrary.CrashHandler;
+import com.xcp.baselibrary.database.SupportDaoFactory;
 
 /**
  * Created by 许成谱 on 2018/5/29 18:48.
@@ -19,6 +20,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         CrashHandler.getInstance().init(this);//初始化崩溃收集类
+        SupportDaoFactory.getInstance().init(this);//初始化自定义数据库
         //阿里热修复AndFix初始化
        /* patchManager = new PatchManager(this);
 

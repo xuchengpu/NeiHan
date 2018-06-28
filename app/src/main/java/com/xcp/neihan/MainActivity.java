@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xcp.baselibrary.database.ISupportDao;
+import com.xcp.baselibrary.database.SupportDaoFactory;
 import com.xcp.baselibrary.dialog.AlertDialog;
 import com.xcp.baselibrary.fix.FixManager;
 import com.xcp.baselibrary.http.HttpUtils;
@@ -21,6 +23,7 @@ import com.xcp.framelibrary.HttpCallBack;
 import com.xcp.framelibrary.SkinBaseActivity;
 import com.xcp.neihan.api.Constants;
 import com.xcp.neihan.bean.HomeBean;
+import com.xcp.neihan.bean.Person;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +72,10 @@ public class MainActivity extends SkinBaseActivity {
     @Override
     protected void initData() {
         tvHello.setText("ioc注解");
-        getDataFromNet();
+        //插入数据
+        ISupportDao dao = SupportDaoFactory.getInstance().getDao(Person.class);
+//        getDataFromNet();
+
     }
 
     private void getDataFromNet() {
