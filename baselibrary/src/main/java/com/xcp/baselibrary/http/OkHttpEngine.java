@@ -57,7 +57,7 @@ public class OkHttpEngine implements IHttpEngine {
     }
 
     @Override
-    public void get(Context context, String url, Map<String, Object> params, final HttpCallBack callBack) {
+    public void get(Context context, String url, Map<String, Object> params, final EngineCallBack callBack) {
 
         url = HttpUtils.jointParams(url, params);
         Log.e("Get请求路径：", url);
@@ -89,7 +89,7 @@ public class OkHttpEngine implements IHttpEngine {
     }
 
     @Override
-    public void post(Context context, String url, Map<String, Object> params, final HttpCallBack callBack) {
+    public void post(Context context, String url, Map<String, Object> params, final EngineCallBack callBack) {
 
 
         RequestBody requestBody = appendBody(params);
@@ -98,12 +98,12 @@ public class OkHttpEngine implements IHttpEngine {
         Request request = new Request.Builder()
                 .url(url)
                 .tag(context)
-//               .addHeader("Cookie", "xxx")//可添加Cookie，User-Agent什么的 但在创建OkHttpClient时需要设置管理Cookie的CookieJar：
+//               .addHeader("Cookie", "xxx")//可添加Cookie，User-Agent什么的 但在创建OkHttpClient时需要设置管理Cookie的CookieJar，在我们封装的这个类中，公共参数更倾向于在HttpCallBack的onPrepare中添加到params,避免在OkHttpEngine（底层）掺入业务，实现解耦
 //                .cacheControl()
                 .post(requestBody)
                 .build();
 
-        mClient.newCall(request).enqueue(new Callback() {
+        mClient.newCall(request).enqueue(new Callback() {//enqueue表示是在异步中执行，回调等都是在异步
             @Override
             public void onFailure(Call call, IOException e) {
                 callBack.onFailure(e);

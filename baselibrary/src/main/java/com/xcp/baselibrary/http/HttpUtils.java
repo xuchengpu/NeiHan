@@ -2,6 +2,8 @@ package com.xcp.baselibrary.http;
 
 import android.content.Context;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,9 +20,9 @@ public class HttpUtils {
     private String mUrl;//请求url
     private Map<String, Object> mParams;//请求参数
     //请求类型
-    private final static String TYPE_GET = "type_get";
-    private final static String TYPE_POST = "type_post";
-    private String requestType = TYPE_GET;//默认get请求
+    private final static int TYPE_GET = 0x0011;
+    private final static int TYPE_POST = 0x0022;
+    private int requestType = TYPE_GET;//默认get请求
     private IHttpEngine httpEngine;//网络请求引擎
 
     private HttpUtils(Context context) {
@@ -63,10 +65,11 @@ public class HttpUtils {
         return this;
     }
 
-    public void execute(HttpCallBack callBack) {
+    public void execute(EngineCallBack callBack) {
         if (callBack == null) {
             callBack = new DefaultCallBack();//如果用户没有添加，默认添加一个
         }
+        callBack.onPrepare(mContext, mParams);//网络请求执行前的回调，用于添加一些公共参数、通知显示进度条等操作
         if (requestType == TYPE_GET) {
             httpEngine.get(mContext, mUrl, mParams, callBack);
         }
@@ -80,7 +83,12 @@ public class HttpUtils {
         execute(null);
     }
 
-    public static class DefaultCallBack implements HttpCallBack {
+    public static class DefaultCallBack implements EngineCallBack {
+        @Override
+        public void onPrepare(Context context, Map<String, Object> params) {
+
+        }
+
         @Override
         public void onFailure(Exception e) {
 
@@ -91,6 +99,7 @@ public class HttpUtils {
 
         }
     }
+
     /**
      * 拼接参数，此方法其他引擎可能也会用到，故放在此
      */
@@ -115,5 +124,14 @@ public class HttpUtils {
         stringBuffer.deleteCharAt(stringBuffer.length() - 1);
 
         return stringBuffer.toString();
+    }
+
+    /**
+     * 解析一个类上面的class信息
+     */
+    public static Class<?> analysisClazzInfo(Object object) {
+        Type genType = object.getClass().getGenericSuperclass();
+        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+        return (Class<?>) params[0];
     }
 }

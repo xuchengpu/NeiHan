@@ -1,5 +1,6 @@
 package com.xcp.neihan;
 
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
@@ -11,17 +12,19 @@ import android.widget.Toast;
 
 import com.xcp.baselibrary.dialog.AlertDialog;
 import com.xcp.baselibrary.fix.FixManager;
-import com.xcp.baselibrary.http.HttpCallBack;
 import com.xcp.baselibrary.http.HttpUtils;
 import com.xcp.baselibrary.http.OkHttpEngine;
 import com.xcp.baselibrary.ioc.BindView;
 import com.xcp.baselibrary.utils.UIUtils;
 import com.xcp.framelibrary.DefaultTitleBar;
+import com.xcp.framelibrary.HttpCallBack;
 import com.xcp.framelibrary.SkinBaseActivity;
 import com.xcp.neihan.api.Constants;
+import com.xcp.neihan.bean.HomeBean;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 public class MainActivity extends SkinBaseActivity {
 
@@ -74,16 +77,33 @@ public class MainActivity extends SkinBaseActivity {
                 .url(Constants.HOME_URL)
                 .get()
                 .setEngine(new OkHttpEngine())
-                .execute(new HttpCallBack() {
+                .execute(new HttpCallBack<HomeBean>() {
+                    @Override
+                    public void onPrepare(Context context, Map<String, Object> params) {
+                        super.onPrepare(context, params);
+                        //此处可重写onPrepare方法，用来在这里放置显示进度条逻辑等
+                    }
+
+                    @Override
+                    public void onDecorateSuccess(HomeBean resultBean) {
+                        //此处可写隐藏进度条逻辑
+                        Log.e("TAG", "HttpUtils请求成功了");
+                        Log.e("TAG", "resultBean=="+resultBean);
+                    }
+
                     @Override
                     public void onFailure(Exception e) {
                         Log.e("TAG", "HttpUtils请求失败了");
                     }
 
-                    @Override
-                    public void onSuccess(String response) {
-                        Log.e("TAG", "HttpUtils请求成功了");
-                    }
+//                    @Override
+//                    public void onSuccess(String response) {
+//                        //此处可写隐藏进度条逻辑
+//                        Log.e("TAG", "HttpUtils请求成功了");
+//                    }
+
+
+
                 });
     }
 
