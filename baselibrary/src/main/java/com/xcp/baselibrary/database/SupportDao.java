@@ -54,10 +54,6 @@ public class SupportDao<T> implements ISupportDao<T> {
     @Override
     public long insert(T t) {
         //插入语句
-//        ContentValues values = new ContentValues();
-//        values.put("name", person.getName());
-//        values.put("age", person.getAge());
-//        mSqLiteDatabase.insert(DaoUtil.getTableName(mClazz), null, values);
         ContentValues values = getContentValuesByObj(t);
 
         return mSqLiteDatabase.insert(DaoUtil.getTableName(mClazz), null, values);

@@ -27,7 +27,7 @@ public interface ISupportDao<T> {
     //删
 //    int delete(T t);
     //改
-//    int insert(T t);
+//    int update(T t);
     //查
-//    int insert(T t);
+//    int query();
 }
