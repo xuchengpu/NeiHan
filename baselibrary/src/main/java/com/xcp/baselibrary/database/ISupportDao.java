@@ -2,6 +2,8 @@ package com.xcp.baselibrary.database;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.List;
+
 /**
  * Created by 许成谱 on 2018/6/28 17:54.
  * qq:1550540124
@@ -18,7 +20,10 @@ public interface ISupportDao<T> {
      */
     void init(SQLiteDatabase database,Class<T> clazz);
     //增
-    int insert(T t);
+    long insert(T t);
+    //批量增
+    void insert(List<T> t);
+
     //删
 //    int delete(T t);
     //改

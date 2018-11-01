@@ -27,6 +27,8 @@ import com.xcp.neihan.bean.Person;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends SkinBaseActivity {
@@ -73,7 +75,17 @@ public class MainActivity extends SkinBaseActivity {
     protected void initData() {
         tvHello.setText("ioc注解");
         //插入数据
-        ISupportDao dao = SupportDaoFactory.getInstance().getDao(Person.class);
+        ISupportDao<Person> dao = SupportDaoFactory.getInstance().getDao(Person.class);
+        List<Person> personList = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            Person person = new Person("doudou", 28+i);
+            personList.add(person);
+        }
+        long pre = System.currentTimeMillis();
+        dao.insert(personList);
+        long end = System.currentTimeMillis();
+        long l = end - pre;
+        Toast.makeText(MainActivity.this, "插入成功，耗时："+l, Toast.LENGTH_SHORT).show();
 //        getDataFromNet();
 
     }
@@ -94,7 +106,7 @@ public class MainActivity extends SkinBaseActivity {
                     public void onDecorateSuccess(HomeBean resultBean) {
                         //此处可写隐藏进度条逻辑
                         Log.e("TAG", "HttpUtils请求成功了");
-                        Log.e("TAG", "resultBean=="+resultBean);
+                        Log.e("TAG", "resultBean==" + resultBean);
                     }
 
                     @Override
@@ -107,7 +119,6 @@ public class MainActivity extends SkinBaseActivity {
 //                        //此处可写隐藏进度条逻辑
 //                        Log.e("TAG", "HttpUtils请求成功了");
 //                    }
-
 
 
                 });
@@ -128,6 +139,8 @@ public class MainActivity extends SkinBaseActivity {
 
 //        customFix();
         initToolbar();
+        long maxMemory = Runtime.getRuntime().maxMemory() / 1024 / 1024;
+        Log.e("TAG", "maxMemory==" + maxMemory + "M");
     }
 
     private void initToolbar() {

@@ -1,9 +1,13 @@
 package com.xcp.baselibrary.database;
 
+import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.ArrayMap;
 import android.util.Log;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * Created by 许成谱 on 2018/6/28 18:28.
@@ -16,6 +20,8 @@ public class SupportDao<T> implements ISupportDao<T> {
 
     private SQLiteDatabase mSqLiteDatabase;
     private Class<T> mClazz;
+    private Object[] puts = new Object[2];
+    private ArrayMap<String, Method> methodArrayMap = new ArrayMap<>();//缓存反射的方法，提高性能
 
     @Override
     public void init(SQLiteDatabase sqLiteDatabase, Class<T> clazz) {
@@ -46,14 +52,56 @@ public class SupportDao<T> implements ISupportDao<T> {
     }
 
     @Override
-    public int insert(T t) {
+    public long insert(T t) {
         //插入语句
 //        ContentValues values = new ContentValues();
 //        values.put("name", person.getName());
 //        values.put("age", person.getAge());
 //        mSqLiteDatabase.insert(DaoUtil.getTableName(mClazz), null, values);
+        ContentValues values = getContentValuesByObj(t);
 
+        return mSqLiteDatabase.insert(DaoUtil.getTableName(mClazz), null, values);
+    }
 
-        return 0;
+    @Override
+    public void insert(List<T> t) {
+        //批量插入，开启事务，为大批量插入数据做准备
+        mSqLiteDatabase.beginTransaction();
+        for (T t1 : t) {
+            insert(t1);
+        }
+        mSqLiteDatabase.setTransactionSuccessful();
+        mSqLiteDatabase.endTransaction();
+    }
+
+    private ContentValues getContentValuesByObj(T obj) {
+        ContentValues values = new ContentValues();
+        Field[] fields = obj.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                String name = field.getName();
+                Object value = field.get(obj);
+                //用一个数组存储数据写入放射方法，能提高性能
+                puts[0] = name;
+                puts[1] = value;
+                //先从缓存中读取
+                Method put = methodArrayMap.get(field.getType().getName());
+                if (put == null) {
+                    //使用反射是因为我们不知道要存储的 数据类型，只能通过反射的方式往put里写入数据
+                    put = ContentValues.class.getDeclaredMethod("put", String.class, value.getClass());
+                    methodArrayMap.put(name, put);
+                }
+                put.invoke(values, puts);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e("TAG", " " + e.getMessage());
+            } finally {
+                //置空
+                puts[0] = null;
+                puts[1] = null;
+            }
+        }
+        return values;
     }
 }

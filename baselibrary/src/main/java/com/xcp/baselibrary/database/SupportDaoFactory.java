@@ -12,7 +12,8 @@ import java.io.File;
  * 使用工厂模式得到ISupportDao对象，方便后期扩展。
  * 系统提供的SQLiteOpenHelper太麻烦，跟其他的第三方一样，生成的数据库文件在data/data/packagename/database目录下，当软件卸载时也随之卸载了
  * 此处为方便应用卸载时，数据库也随之卸载，清楚垃圾数据，将数据库放在应用内的path==/storage/emulated/0/Android/data/com.xcp.neihan/files
- * 使用姿势：1、先在application中初始化
+ * 使用姿势：
+ * 1、先在application中初始化
  * 2、在需要的地方调用
  */
 
@@ -37,7 +38,7 @@ public class SupportDaoFactory {
     }
 
     /**
-     * 初始化的方法，使用前就调用
+     * 初始化的方法，使用前就调用,可在此更换存储数据库的位置
      *
      * @param context
      */
