@@ -25,6 +25,8 @@ public class HttpUtils {
     private int requestType = TYPE_GET;//默认get请求
     private IHttpEngine httpEngine;//网络请求引擎
 
+    private boolean mCache = false;
+
     private HttpUtils(Context context) {
         this.mContext = context;
         mParams = new HashMap<>();
@@ -42,6 +44,11 @@ public class HttpUtils {
 
     public HttpUtils url(String url) {
         mUrl = url;
+        return this;
+    }
+
+    public HttpUtils setmCache(boolean mCache) {
+        this.mCache = mCache;
         return this;
     }
 
@@ -71,10 +78,10 @@ public class HttpUtils {
         }
         callBack.onPrepare(mContext, mParams);//网络请求执行前的回调，用于添加一些公共参数、通知显示进度条等操作
         if (requestType == TYPE_GET) {
-            httpEngine.get(mContext, mUrl, mParams, callBack);
+            httpEngine.get(mContext, mUrl, mParams, callBack,mCache);
         }
         if (requestType == TYPE_POST) {
-            httpEngine.post(mContext, mUrl, mParams, callBack);
+            httpEngine.post(mContext, mUrl, mParams, callBack,mCache);
         }
 
     }

@@ -47,7 +47,7 @@ public class SupportDao<T> implements ISupportDao<T> {
             sb.append(name + columnType + ", ");
         }
         sb.replace(sb.length() - 2, sb.length(), ")");
-        Log.e("tag", "表语句--> " + sb.toString());
+//        Log.e("tag", "表语句--> " + sb.toString());
         //创建数据库
         mSqLiteDatabase.execSQL(sb.toString());
     }

@@ -21,13 +21,11 @@ import com.xcp.baselibrary.utils.UIUtils;
 import com.xcp.framelibrary.DefaultTitleBar;
 import com.xcp.framelibrary.HttpCallBack;
 import com.xcp.framelibrary.SkinBaseActivity;
-import com.xcp.neihan.api.Constants;
 import com.xcp.neihan.bean.HomeBean;
 import com.xcp.neihan.bean.Person;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends SkinBaseActivity {
@@ -85,21 +83,28 @@ public class MainActivity extends SkinBaseActivity {
 //        long end = System.currentTimeMillis();
 //        long l = end - pre;
 //        Toast.makeText(MainActivity.this, "插入成功，耗时："+l, Toast.LENGTH_SHORT).show();
-//        getDataFromNet();
-        Log.e("TAG", "删除前数据量为" + dao.query().queryAll().size());
-        dao.delete("age < ?", new String[]{6000 + ""});
-        Log.e("TAG", "删除后数据量为" + dao.query().queryAll().size());
-        List<Person> query = dao.query().selection("age = ?").selectionArgs(new String[]{"" + 7000}).query();
-        Log.e("TAG", "按条件查询数据量为" + query.size());
-        for (Person person : query) {
-            Log.e("TAG", "person==" + person.toString());
-        }
+        getDataFromNet();
+//        Log.e("TAG", "删除前数据量为" + dao.query().queryAll().size());
+//        dao.delete("age < ?", new String[]{6000 + ""});
+//        Log.e("TAG", "删除后数据量为" + dao.query().queryAll().size());
+//        List<Person> query = dao.query().selection("age = ?").selectionArgs(new String[]{"" + 7000}).query();
+//        Log.e("TAG", "按条件查询数据量为" + query.size());
+//        for (Person person : query) {
+//            Log.e("TAG", "person==" + person.toString());
+//        }
     }
 
     private void getDataFromNet() {
         HttpUtils.with(this)
-                .url(Constants.HOME_URL)
-                .get()
+//                .url(Constants.HOME_URL)
+//                .url("http://is.snssdk.com/2/essay/discovery/v3/")
+//                .get()
+                .url("https://app.preova.com/api/app-user-login")
+                .post()
+                .addParams("mobile","2NwhVvZTbiLupvY3lsZeBw==")
+                .addParams("verify_code","5424")
+                .addParams("device_type","1")
+                .setmCache(true)
                 .setEngine(new OkHttpEngine())
                 .execute(new HttpCallBack<HomeBean>() {
                     @Override
@@ -145,8 +150,8 @@ public class MainActivity extends SkinBaseActivity {
 
 //        customFix();
         initToolbar();
-        long maxMemory = Runtime.getRuntime().maxMemory() / 1024 / 1024;
-        Log.e("TAG", "maxMemory==" + maxMemory + "M");
+//        long maxMemory = Runtime.getRuntime().maxMemory() / 1024 / 1024;
+//        Log.e("TAG", "maxMemory==" + maxMemory + "M");
     }
 
     private void initToolbar() {

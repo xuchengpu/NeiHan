@@ -1,7 +1,11 @@
 package com.xcp.baselibrary.http;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.xcp.baselibrary.utils.CacheUtils;
+import com.xcp.baselibrary.utils.MD5Encoder;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,14 +61,20 @@ public class OkHttpEngine implements IHttpEngine {
     }
 
     @Override
-    public void get(Context context, String url, Map<String, Object> params, final EngineCallBack callBack) {
+    public void get(Context context, String url, Map<String, Object> params, final EngineCallBack callBack, final boolean cache) {
 
-        url = HttpUtils.jointParams(url, params);
-        Log.e("Get请求路径：", url);
-
+        final String mFinalUrl = HttpUtils.jointParams(url, params);
+        Log.e("TAG","Get请求路径："+ url);
+        if (cache) {
+            String cacheResonse = CacheUtils.getCache(mFinalUrl);
+            if (!TextUtils.isEmpty(cacheResonse)) {
+                Log.e("TAG", "读取缓存成功");
+                callBack.onSuccess(cacheResonse);
+            }
+        }
 
         Request request = new Request.Builder()
-                .url(url)
+                .url(mFinalUrl)
                 .tag(context)
 //               .addHeader("Cookie", "xxx")//可添加Cookie，User-Agent什么的 但在创建OkHttpClient时需要设置管理Cookie的CookieJar：
 //                .cacheControl()
@@ -81,19 +91,43 @@ public class OkHttpEngine implements IHttpEngine {
                 //response的body有很多种输出方法，string()只是其中之一，注意是string()不是toString()。如果是下载文件就是response.body().bytes()。
                 //另外可以根据response.code()获取返回的状态码。
                 String resultJson = response.body().string();
+                if (cache) {
+                    String cacheResonse = CacheUtils.getCache(mFinalUrl);
+                    if (!TextUtils.isEmpty(cacheResonse)) {
+                        //如果缓存与请求结果一致，则不再刷新显示，如果不一致，则先刷新显示，再刷新数据库
+                        if (cacheResonse.equals(resultJson)) {
+                            Log.e("TAG", "数据和缓存结果一致");
+                            return;
+                        }
+                    }
+                    CacheUtils.updataCache(new CacheBean(MD5Encoder.encode(mFinalUrl), resultJson));
+                }
                 callBack.onSuccess(resultJson);
-                Log.e("Get返回结果：", resultJson);
+                Log.e("TAG：", "Get返回结果:"+resultJson);
             }
         });
 
     }
 
     @Override
-    public void post(Context context, String url, Map<String, Object> params, final EngineCallBack callBack) {
+    public void post(Context context, String url, Map<String, Object> params, final EngineCallBack callBack, final boolean cache) {
 
+        StringBuilder sb=new StringBuilder();
+        sb.append(url);
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            sb.append(entry.getKey());
+            sb.append(entry.getValue());
+        }
+        final String key = url + sb.toString();
+        if (cache) {
+            String cacheResonse = CacheUtils.getCache(key);
+            if (!TextUtils.isEmpty(cacheResonse)) {
+                Log.e("TAG", "读取缓存成功");
+                callBack.onSuccess(cacheResonse);
+            }
+        }
 
         RequestBody requestBody = appendBody(params);
-
         //post与get区别仅仅是需要把params包装一下，然后通过post(requestBody)方法传递进request而已
         Request request = new Request.Builder()
                 .url(url)
@@ -114,8 +148,21 @@ public class OkHttpEngine implements IHttpEngine {
                 //response的body有很多种输出方法，string()只是其中之一，注意是string()不是toString()。如果是下载文件就是response.body().bytes()。
                 //另外可以根据response.code()获取返回的状态码。
                 String resultJson = response.body().string();
+
+                if (cache) {
+                    String cacheResonse = CacheUtils.getCache(key);
+                    if (!TextUtils.isEmpty(cacheResonse)) {
+                        //如果缓存与请求结果一致，则不再刷新显示，如果不一致，则先刷新显示，再刷新数据库
+                        if (cacheResonse.equals(resultJson)) {
+                            Log.e("TAG", "数据和缓存结果一致");
+                            return;
+                        }
+                    }
+                    CacheUtils.updataCache(new CacheBean(MD5Encoder.encode(key), resultJson));
+                }
+
                 callBack.onSuccess(resultJson);
-                Log.e("post返回结果：", resultJson);
+                Log.e("TAG", "post返回结果："+resultJson);
             }
         });
 
