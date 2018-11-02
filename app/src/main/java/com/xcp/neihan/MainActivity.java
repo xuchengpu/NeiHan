@@ -27,7 +27,6 @@ import com.xcp.neihan.bean.Person;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -76,18 +75,25 @@ public class MainActivity extends SkinBaseActivity {
         tvHello.setText("ioc注解");
         //插入数据
         ISupportDao<Person> dao = SupportDaoFactory.getInstance().getDao(Person.class);
-        List<Person> personList = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            Person person = new Person("doudou", 28+i);
-            personList.add(person);
-        }
-        long pre = System.currentTimeMillis();
-        dao.insert(personList);
-        long end = System.currentTimeMillis();
-        long l = end - pre;
-        Toast.makeText(MainActivity.this, "插入成功，耗时："+l, Toast.LENGTH_SHORT).show();
+//        List<Person> personList = new ArrayList<>();
+//        for (int i = 0; i < 10000; i++) {
+//            Person person = new Person("doudou", 28+i);
+//            personList.add(person);
+//        }
+//        long pre = System.currentTimeMillis();
+//        dao.insert(personList);
+//        long end = System.currentTimeMillis();
+//        long l = end - pre;
+//        Toast.makeText(MainActivity.this, "插入成功，耗时："+l, Toast.LENGTH_SHORT).show();
 //        getDataFromNet();
-
+        Log.e("TAG", "删除前数据量为" + dao.query().queryAll().size());
+        dao.delete("age < ?", new String[]{6000 + ""});
+        Log.e("TAG", "删除后数据量为" + dao.query().queryAll().size());
+        List<Person> query = dao.query().selection("age = ?").selectionArgs(new String[]{"" + 7000}).query();
+        Log.e("TAG", "按条件查询数据量为" + query.size());
+        for (Person person : query) {
+            Log.e("TAG", "person==" + person.toString());
+        }
     }
 
     private void getDataFromNet() {

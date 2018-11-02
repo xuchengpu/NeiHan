@@ -22,6 +22,7 @@ public class SupportDao<T> implements ISupportDao<T> {
     private Class<T> mClazz;
     private Object[] puts = new Object[2];
     private ArrayMap<String, Method> methodArrayMap = new ArrayMap<>();//缓存反射的方法，提高性能
+    private QuerySupport querySupport;
 
     @Override
     public void init(SQLiteDatabase sqLiteDatabase, Class<T> clazz) {
@@ -55,7 +56,6 @@ public class SupportDao<T> implements ISupportDao<T> {
     public long insert(T t) {
         //插入语句
         ContentValues values = getContentValuesByObj(t);
-
         return mSqLiteDatabase.insert(DaoUtil.getTableName(mClazz), null, values);
     }
 
@@ -68,6 +68,46 @@ public class SupportDao<T> implements ISupportDao<T> {
         }
         mSqLiteDatabase.setTransactionSuccessful();
         mSqLiteDatabase.endTransaction();
+    }
+
+    @Override
+    public int delete(String whereCause, String[] whereArgs) {
+        return mSqLiteDatabase.delete(DaoUtil.getTableName(mClazz), whereCause, whereArgs);
+    }
+
+    @Override
+    public int update(T obj, String whereCause, String... whereArgs) {
+        ContentValues values = getContentValuesByObj(obj);
+        return mSqLiteDatabase.update(DaoUtil.getTableName(mClazz),
+                values, whereCause, whereArgs);
+    }
+
+    @Override
+    public QuerySupport<T> query() {
+        if(querySupport==null) {
+            querySupport=new QuerySupport(mSqLiteDatabase,mClazz);
+        }
+        return querySupport;
+    }
+
+    private String getColumnMethodName(Class<?> fieldType) {
+        String typeName;
+        if (fieldType.isPrimitive()) {
+            typeName = DaoUtil.capitalize(fieldType.getName());
+        } else {
+            typeName = fieldType.getSimpleName();
+        }
+        String methodName = "get" + typeName;
+        if ("getBoolean".equals(methodName)) {
+            methodName = "getInt";
+        } else if ("getChar".equals(methodName) || "getCharacter".equals(methodName)) {
+            methodName = "getString";
+        } else if ("getDate".equals(methodName)) {
+            methodName = "getLong";
+        } else if ("getInteger".equals(methodName)) {
+            methodName = "getInt";
+        }
+        return methodName;
     }
 
     private ContentValues getContentValuesByObj(T obj) {

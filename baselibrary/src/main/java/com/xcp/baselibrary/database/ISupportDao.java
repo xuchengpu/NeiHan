@@ -25,9 +25,10 @@ public interface ISupportDao<T> {
     void insert(List<T> t);
 
     //删
-//    int delete(T t);
+    int delete(String whereCause,String[] whereArgs);
     //改
-//    int update(T t);
-    //查
-//    int query();
+    int update(T obj, String whereCause, String... whereArgs);
+
+    //个性化拼接查
+    QuerySupport<T> query();
 }
