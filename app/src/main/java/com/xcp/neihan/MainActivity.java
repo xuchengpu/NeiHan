@@ -1,12 +1,16 @@
 package com.xcp.neihan;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,10 +21,13 @@ import com.xcp.baselibrary.fix.FixManager;
 import com.xcp.baselibrary.http.HttpUtils;
 import com.xcp.baselibrary.http.OkHttpEngine;
 import com.xcp.baselibrary.ioc.BindView;
+import com.xcp.baselibrary.ioc.CheckNet;
+import com.xcp.baselibrary.ioc.OnClick;
 import com.xcp.baselibrary.utils.UIUtils;
 import com.xcp.framelibrary.DefaultTitleBar;
 import com.xcp.framelibrary.HttpCallBack;
 import com.xcp.framelibrary.SkinBaseActivity;
+import com.xcp.framelibrary.skin.SkinManager;
 import com.xcp.neihan.bean.HomeBean;
 import com.xcp.neihan.bean.Person;
 
@@ -32,15 +39,19 @@ public class MainActivity extends SkinBaseActivity {
 
     @BindView(R.id.tv_hello)
     TextView tvHello;
+    @BindView(R.id.btn_change_skin)
+    Button btnChangeSkin;
+    @BindView(R.id.btn_another)
+    Button btnAnother;
+    @BindView(R.id.btn_default_skin)
+    Button btnDefaultSkin;
+    @BindView(R.id.iv_skin)
+    ImageView ivSkin;
+    private Drawable drawable;
 
     @Override
     protected void initListener() {
-        tvHello.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showMyDialog();
-            }
-        });
+
     }
 
     private void showMyDialog() {
@@ -101,9 +112,9 @@ public class MainActivity extends SkinBaseActivity {
 //                .get()
                 .url("https://app.preova.com/api/app-user-login")
                 .post()
-                .addParams("mobile","2NwhVvZTbiLupvY3lsZeBw==")
-                .addParams("verify_code","5424")
-                .addParams("device_type","1")
+                .addParams("mobile", "2NwhVvZTbiLupvY3lsZeBw==")
+                .addParams("verify_code", "5424")
+                .addParams("device_type", "1")
                 .setmCache(true)
                 .setEngine(new OkHttpEngine())
                 .execute(new HttpCallBack<HomeBean>() {
@@ -150,8 +161,10 @@ public class MainActivity extends SkinBaseActivity {
 
 //        customFix();
         initToolbar();
+
 //        long maxMemory = Runtime.getRuntime().maxMemory() / 1024 / 1024;
 //        Log.e("TAG", "maxMemory==" + maxMemory + "M");
+
     }
 
     private void initToolbar() {
@@ -212,14 +225,28 @@ public class MainActivity extends SkinBaseActivity {
         return R.layout.activity_main;
     }
 
-//    @OnClick({R.id.tv_hello})
-//    @CheckNet
-//    private void onClick(View view) {
-//        switch (view.getId()) {
-//            case R.id.tv_hello:
-//                Toast.makeText(MainActivity.this, "注解点击事件生效", Toast.LENGTH_SHORT).show();
-//                break;
-//        }
-//
-//    }
+    @OnClick({R.id.btn_default_skin, R.id.btn_another, R.id.tv_hello, R.id.btn_change_skin})
+    @CheckNet
+    private void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.tv_hello:
+                showMyDialog();
+                break;
+            case R.id.btn_change_skin:
+                changeSkin();
+                break;
+            case R.id.btn_default_skin:
+                break;
+            case R.id.btn_another:
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                break;
+        }
+
+    }
+
+    private void changeSkin() {
+        String path = getExternalFilesDir(null).getAbsolutePath() + File.separator + "blue.apk";
+        SkinManager.getInstance().changeSkin(path);
+    }
 }

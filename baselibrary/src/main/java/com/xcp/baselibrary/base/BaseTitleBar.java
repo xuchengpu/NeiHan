@@ -30,7 +30,7 @@ public abstract class BaseTitleBar<E extends BaseTitleBar.Params> implements ITi
 
         if (params.parent == null) {
             ViewGroup decorView = (ViewGroup) ((Activity) params.mContext).getWindow().getDecorView();
-            params.parent = (ViewGroup) decorView.getChildAt(0);
+            params.parent = (ViewGroup) decorView.getChildAt(0);//decorView也只有linearlayout一个子孩子
         }
         //此处为考虑国内厂商定制了手机系统，可能该布局不存在
         if (params.parent == null) {

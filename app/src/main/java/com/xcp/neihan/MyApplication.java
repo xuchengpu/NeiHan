@@ -5,6 +5,7 @@ import android.app.Application;
 import com.alipay.euler.andfix.patch.PatchManager;
 import com.xcp.baselibrary.CrashHandler;
 import com.xcp.baselibrary.database.SupportDaoFactory;
+import com.xcp.framelibrary.skin.SkinManager;
 
 /**
  * Created by 许成谱 on 2018/5/29 18:48.
@@ -21,6 +22,7 @@ public class MyApplication extends Application {
         super.onCreate();
         CrashHandler.getInstance().init(this);//初始化崩溃收集类
         SupportDaoFactory.getInstance().init(this);//初始化自定义数据库
+        SkinManager.getInstance().init(this); //换肤
         //阿里热修复AndFix初始化
        /* patchManager = new PatchManager(this);
 

@@ -9,4 +9,13 @@
     <color name="list_item_divider">#ffe6e6e6</color>
     <color name="comment_dialog_share_text">#ff333333</color>
     <color name="comment_dialog_submit_text">#ffffffff</color>
+
+    <color name="yunyouPink" >#fa9aa9</color>
+    <color name="lightGray" >#999999</color>
+    <color name="yunyouYellow" >#ff8400</color>
+    <color name="lightBlack" >#333333</color>
+    <color name="gray" >#666666</color>
+    <color name="lighterGray" >#cccccc</color>
+    <color name="skinColor" >#333333</color>
+    <color name="skinGreen" >#009933</color>
 </resources>
