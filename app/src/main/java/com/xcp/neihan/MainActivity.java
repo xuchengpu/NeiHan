@@ -236,6 +236,7 @@ public class MainActivity extends SkinBaseActivity {
                 changeSkin();
                 break;
             case R.id.btn_default_skin:
+                SkinManager.getInstance().reStoreSkin();
                 break;
             case R.id.btn_another:
                 Intent intent = new Intent(this, MainActivity.class);
