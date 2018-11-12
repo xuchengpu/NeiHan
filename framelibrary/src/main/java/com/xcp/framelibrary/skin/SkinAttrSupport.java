@@ -23,8 +23,8 @@ public class SkinAttrSupport {
      * @param attrs
      * @return
      */
-    public static List<SkinAttr> getSkinAttrs(Context context, AttributeSet attrs) {
-        List<SkinAttr> skinAttrs = new ArrayList<>();
+    public static List<SkinParam> getSkinParams(Context context, AttributeSet attrs) {
+        List<SkinParam> skinParams = new ArrayList<>();
         int count = attrs.getAttributeCount();
         for (int i = 0; i < count; i++) {
             String attributeName = attrs.getAttributeName(i);
@@ -33,16 +33,17 @@ public class SkinAttrSupport {
             if (skinAttr != null) {
                 String resName = getResName(context, attributeValue);
                 if (!TextUtils.isEmpty(resName)) {
-                    skinAttr.setResName(resName);
-                    skinAttrs.add(skinAttr);
+                    SkinParam skinParam = new SkinParam(resName, skinAttr);
+                    skinParams.add(skinParam);
                 }
             }
         }
-        return skinAttrs;
+        return skinParams;
     }
 
     /**
      * 把@开头的value值转化成字符串形式的资源名称
+     *
      * @param context
      * @param attributeValue
      * @return
@@ -58,6 +59,7 @@ public class SkinAttrSupport {
 
     /**
      * 获取单个属性类型
+     *
      * @param attributeName
      * @return
      */

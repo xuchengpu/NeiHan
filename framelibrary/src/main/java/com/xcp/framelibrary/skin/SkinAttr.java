@@ -17,9 +17,8 @@ import android.widget.TextView;
 public enum SkinAttr {
     BACKGROUND("background") {
         @Override
-        public void setSkin(View view) {
+        public void setSkin(View view,String resName) {
             SkinResource resouces = getResouces();
-            String resName = getResName();
             ColorStateList color = resouces.getColorByName(resName);
             //可能是颜色
             if (color != null) {
@@ -34,9 +33,8 @@ public enum SkinAttr {
         }
     }, TEXTCOLOR("textColor") {
         @Override
-        public void setSkin(View view) {
+        public void setSkin(View view,String resName) {
             SkinResource resouces = getResouces();
-            String resName = getResName();
             ColorStateList color = resouces.getColorByName(resName);
             if (color != null) {
                 ((TextView) view).setTextColor(color.getDefaultColor());
@@ -44,9 +42,8 @@ public enum SkinAttr {
         }
     }, SRC("src") {
         @Override
-        public void setSkin(View view) {
+        public void setSkin(View view,String resName) {
             SkinResource resouces = getResouces();
-            String resName = getResName();
             Drawable drawable = resouces.getDrawableByName(resName);
             if (drawable != null) {
                 ((ImageView) view).setImageDrawable(drawable);
@@ -71,17 +68,7 @@ public enum SkinAttr {
         this.attrType = attrType;
     }
 
-    public String getResName() {
-        return resName;
-    }
-
-    public void setResName(String resName) {
-        this.resName = resName;
-    }
-
-    private String resName;
-
-    public abstract void setSkin(View view);
+    public abstract void setSkin(View view,String resName);
 
     public SkinResource getResouces() {
         return SkinManager.getInstance().getSkinResource();

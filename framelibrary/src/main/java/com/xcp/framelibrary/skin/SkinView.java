@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class SkinView {
     private View view;
-    private List<SkinAttr> skinAttrs;
+    private List<SkinParam> skinParams;
 
     public View getView() {
         return view;
@@ -22,16 +22,16 @@ public class SkinView {
         this.view = view;
     }
 
-    public List<SkinAttr> getSkinAttrs() {
-        return skinAttrs;
+    public List<SkinParam> getSkinParams() {
+        return skinParams;
     }
 
-    public void setSkinAttrs(List<SkinAttr> skinAttrs) {
-        this.skinAttrs = skinAttrs;
+    public void setParams(List<SkinParam> skinParams) {
+        this.skinParams = skinParams;
     }
 
-    public SkinView(View view, List<SkinAttr> skinAttrs) {
+    public SkinView(View view, List<SkinParam> skinParams) {
         this.view = view;
-        this.skinAttrs = skinAttrs;
+        this.skinParams = skinParams;
     }
 }

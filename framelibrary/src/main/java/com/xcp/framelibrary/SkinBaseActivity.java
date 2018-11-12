@@ -17,9 +17,9 @@ import android.view.ViewParent;
 
 import com.xcp.baselibrary.base.BaseActivity;
 import com.xcp.framelibrary.skin.SkinAppCompatViewInflater;
-import com.xcp.framelibrary.skin.SkinAttr;
 import com.xcp.framelibrary.skin.SkinAttrSupport;
 import com.xcp.framelibrary.skin.SkinManager;
+import com.xcp.framelibrary.skin.SkinParam;
 import com.xcp.framelibrary.skin.SkinView;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -54,11 +54,13 @@ public abstract class SkinBaseActivity  extends BaseActivity implements  LayoutI
         //2.2解析属性 把含有设定类型的attr收集起来放进一个集合里，与对应的view绑定，封装成一个新的实例，再统一交给skinmanager去管理
         Log.e("TAG", "view=="+view);
         if(view!=null) {
-            List<SkinAttr> skinAttrs = SkinAttrSupport.getSkinAttrs(context, attrs);
-            if(skinAttrs!=null&&skinAttrs.size()>0) {
-                SkinView skinView = new SkinView(view, skinAttrs);
+            List<SkinParam> skinParams= SkinAttrSupport.getSkinParams(context, attrs);
+            if(skinParams!=null&&skinParams.size()>0) {
+                SkinView skinView = new SkinView(view, skinParams);
                 //3、统一交给SkinManager去管理
                 SkinManager.getInstance().addView(skinView);
+                //4.判断一下要不要换肤
+                SkinManager.getInstance().checkSkinView(skinView);
             }
         }
         return view;
