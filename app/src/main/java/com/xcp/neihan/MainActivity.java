@@ -165,6 +165,7 @@ public class MainActivity extends SkinBaseActivity {
 //        long maxMemory = Runtime.getRuntime().maxMemory() / 1024 / 1024;
 //        Log.e("TAG", "maxMemory==" + maxMemory + "M");
 
+        startService(new Intent(this,MessageService.class));
     }
 
     private void initToolbar() {

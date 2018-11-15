@@ -16,10 +16,12 @@ import android.view.View;
 import android.view.ViewParent;
 
 import com.xcp.baselibrary.base.BaseActivity;
+import com.xcp.framelibrary.skin.ISkinChangeListener;
 import com.xcp.framelibrary.skin.SkinAppCompatViewInflater;
 import com.xcp.framelibrary.skin.SkinAttrSupport;
 import com.xcp.framelibrary.skin.SkinManager;
 import com.xcp.framelibrary.skin.SkinParam;
+import com.xcp.framelibrary.skin.SkinResource;
 import com.xcp.framelibrary.skin.SkinView;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -31,17 +33,19 @@ import java.util.List;
  * qq:1550540124
  * 热爱生活每一天！
  * 为以后换肤框架预留的基类
+ * 对于第三方控件还有bg\src\textclor三种属性的可在onskinChanged()回调里做对应换肤处理，对于没有这三种属性的：1、人为加上前束三种属性之一，让其能进入skinmanager中走回调路径  2、在onCreateView（）里拦截创建的时候根据条件判断后做文章
  */
 
-public abstract class SkinBaseActivity  extends BaseActivity implements  LayoutInflaterFactory {
+public abstract class SkinBaseActivity extends BaseActivity implements LayoutInflaterFactory, ISkinChangeListener {
     private SkinAppCompatViewInflater mAppCompatViewInflater;
     private static final boolean IS_PRE_LOLLIPOP = Build.VERSION.SDK_INT < 21;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         //1、更据源码分析可知，在此处设置factory可拦截view的创建
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         if (layoutInflater.getFactory() == null) {
-            LayoutInflaterCompat.setFactory(layoutInflater,this);
+            LayoutInflaterCompat.setFactory(layoutInflater, this);
         }
         super.onCreate(savedInstanceState);
     }
@@ -52,15 +56,15 @@ public abstract class SkinBaseActivity  extends BaseActivity implements  LayoutI
         //2.1创建view……拷贝系统创建view的源码，兼容低版本
         View view = createView(parent, name, context, attrs);
         //2.2解析属性 把含有设定类型的attr收集起来放进一个集合里，与对应的view绑定，封装成一个新的实例，再统一交给skinmanager去管理
-        Log.e("TAG", "view=="+view);
-        if(view!=null) {
-            List<SkinParam> skinParams= SkinAttrSupport.getSkinParams(context, attrs);
-            if(skinParams!=null&&skinParams.size()>0) {
+//        Log.e("TAG", "view==" + view);
+        if (view != null) {
+            List<SkinParam> skinParams = SkinAttrSupport.getSkinParams(context, attrs);
+            if (skinParams != null && skinParams.size() > 0) {
                 SkinView skinView = new SkinView(view, skinParams);
                 //3、统一交给SkinManager去管理
-                SkinManager.getInstance().addView(skinView);
+                SkinManager.getInstance().addView(this,skinView);
                 //4.判断一下要不要换肤
-                SkinManager.getInstance().checkSkinView(skinView);
+                SkinManager.getInstance().checkSkinView(this,skinView);
             }
         }
         return view;
@@ -115,4 +119,19 @@ public abstract class SkinBaseActivity  extends BaseActivity implements  LayoutI
         }
     }
 
+    /**
+     * 此方法可在继承的子Activity中重写
+     * @param resources
+     * @param view
+     */
+    @Override
+    public void onSkinChange(SkinResource resources, View view) {
+        Log.e("TAG", "onSkinChange-->"+view.getClass().getSimpleName());
+    }
+    //移除view，防止内存泄露
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SkinManager.getInstance().remove(this);
+    }
 }
