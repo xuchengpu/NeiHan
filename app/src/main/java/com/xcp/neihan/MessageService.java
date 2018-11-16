@@ -65,7 +65,7 @@ public class MessageService extends Service {
                 .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(BitmapFactory.decodeResource(getResources(), R.drawable.home_cartoon)))
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .build();
-        startForeground(MessageId,new Notification());
+        startForeground(MessageId,notification);
         return START_STICKY;
     }
 
