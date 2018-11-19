@@ -1,5 +1,6 @@
 package com.xcp.neihan;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -23,6 +24,9 @@ import com.xcp.baselibrary.http.OkHttpEngine;
 import com.xcp.baselibrary.ioc.BindView;
 import com.xcp.baselibrary.ioc.CheckNet;
 import com.xcp.baselibrary.ioc.OnClick;
+import com.xcp.baselibrary.permissions.PermissionFailed;
+import com.xcp.baselibrary.permissions.PermissionHelper;
+import com.xcp.baselibrary.permissions.PermissionSucceed;
 import com.xcp.baselibrary.utils.UIUtils;
 import com.xcp.framelibrary.DefaultTitleBar;
 import com.xcp.framelibrary.HttpCallBack;
@@ -37,6 +41,7 @@ import java.util.Map;
 
 public class MainActivity extends SkinBaseActivity {
 
+    private static final int STORAGE_REQUEST = 1;
     @BindView(R.id.tv_hello)
     TextView tvHello;
     @BindView(R.id.btn_change_skin)
@@ -165,7 +170,11 @@ public class MainActivity extends SkinBaseActivity {
 //        long maxMemory = Runtime.getRuntime().maxMemory() / 1024 / 1024;
 //        Log.e("TAG", "maxMemory==" + maxMemory + "M");
 
-        startService(new Intent(this,MessageService.class));
+        startService(new Intent(this, MessageService.class));
+        //运用框架申请权限，简介明了
+        PermissionHelper.with(this)
+                .permissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE})
+                .requestCode(STORAGE_REQUEST).request();
     }
 
     private void initToolbar() {
@@ -250,5 +259,15 @@ public class MainActivity extends SkinBaseActivity {
     private void changeSkin() {
         String path = getExternalFilesDir(null).getAbsolutePath() + File.separator + "blue.apk";
         SkinManager.getInstance().changeSkin(path);
+    }
+
+    @PermissionSucceed(requestCode = STORAGE_REQUEST)
+    private void showSuccess() {
+        Toast.makeText(MainActivity.this, "存储权限申请成功", Toast.LENGTH_SHORT).show();
+    }
+
+    @PermissionFailed(requestCode = STORAGE_REQUEST)
+    private void showFailure() {
+        Toast.makeText(MainActivity.this, "存储权限申请失败", Toast.LENGTH_SHORT).show();
     }
 }
