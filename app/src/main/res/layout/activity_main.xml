@@ -38,12 +38,22 @@
         android:text="恢复默认"
         android:textAllCaps="false"
         android:textColor="@color/skinColor" />
+    <Button
+        android:id="@+id/btn_select_img"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/btn_default_skin"
+        android:layout_margin="10dp"
+        android:background="@drawable/home_safe_period_bg"
+        android:text="选择图片"
+        android:textAllCaps="false"
+        android:textColor="@color/skinColor" />
 
     <ImageView
         android:id="@+id/iv_skin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btn_default_skin"
+        android:layout_below="@id/btn_select_img"
         android:src="@drawable/home_safe_period_bg" />
 
     <TextView

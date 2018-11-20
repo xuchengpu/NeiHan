@@ -37,6 +37,7 @@ import com.xcp.neihan.bean.Person;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class MainActivity extends SkinBaseActivity {
@@ -52,7 +53,10 @@ public class MainActivity extends SkinBaseActivity {
     Button btnDefaultSkin;
     @BindView(R.id.iv_skin)
     ImageView ivSkin;
+    @BindView(R.id.btn_select_img)
+    Button btnSelectImg;
     private Drawable drawable;
+    private ArrayList<String> mImageList;//已选定的图片
 
     @Override
     protected void initListener() {
@@ -235,7 +239,7 @@ public class MainActivity extends SkinBaseActivity {
         return R.layout.activity_main;
     }
 
-    @OnClick({R.id.btn_default_skin, R.id.btn_another, R.id.tv_hello, R.id.btn_change_skin})
+    @OnClick({R.id.btn_select_img,R.id.btn_default_skin, R.id.btn_another, R.id.tv_hello, R.id.btn_change_skin})
     @CheckNet
     private void onClick(View view) {
         switch (view.getId()) {
@@ -251,6 +255,14 @@ public class MainActivity extends SkinBaseActivity {
             case R.id.btn_another:
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.btn_select_img:
+                Intent intent2 = new Intent(this, SelecteImageActivity.class);
+                intent2.putExtra(SelecteImageActivity.EXTRA_SELECT_COUNT,9);
+                intent2.putExtra(SelecteImageActivity.EXTRA_SELECT_MODE,SelecteImageActivity.MODE_MULTI);
+                intent2.putStringArrayListExtra(SelecteImageActivity.EXTRA_DEFAULT_SELECTED_LIST, mImageList);
+                intent2.putExtra(SelecteImageActivity.EXTRA_SHOW_CAMERA, true);
+                startActivityForResult(intent2,22);
                 break;
         }
 
@@ -269,5 +281,16 @@ public class MainActivity extends SkinBaseActivity {
     @PermissionFailed(requestCode = STORAGE_REQUEST)
     private void showFailure() {
         Toast.makeText(MainActivity.this, "存储权限申请失败", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==RESULT_OK) {
+            if(requestCode==22&&data!=null) {
+                mImageList=data.getStringArrayListExtra(SelecteImageActivity.EXTRA_DEFAULT_SELECTED_LIST);
+                Log.e("TAG", "mImageList=="+mImageList.toString());
+            }
+        }
     }
 }
