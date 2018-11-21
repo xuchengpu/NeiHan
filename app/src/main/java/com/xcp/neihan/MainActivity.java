@@ -34,6 +34,7 @@ import com.xcp.framelibrary.SkinBaseActivity;
 import com.xcp.framelibrary.skin.SkinManager;
 import com.xcp.neihan.bean.HomeBean;
 import com.xcp.neihan.bean.Person;
+import com.xcp.neihan.utils.ImageSelector;
 
 import java.io.File;
 import java.io.IOException;
@@ -257,12 +258,17 @@ public class MainActivity extends SkinBaseActivity {
                 startActivity(intent);
                 break;
             case R.id.btn_select_img:
-                Intent intent2 = new Intent(this, SelecteImageActivity.class);
-                intent2.putExtra(SelecteImageActivity.EXTRA_SELECT_COUNT,9);
-                intent2.putExtra(SelecteImageActivity.EXTRA_SELECT_MODE,SelecteImageActivity.MODE_MULTI);
-                intent2.putStringArrayListExtra(SelecteImageActivity.EXTRA_DEFAULT_SELECTED_LIST, mImageList);
-                intent2.putExtra(SelecteImageActivity.EXTRA_SHOW_CAMERA, true);
-                startActivityForResult(intent2,22);
+//                Intent intent2 = new Intent(this, SelecteImageActivity.class);
+//                intent2.putExtra(SelecteImageActivity.EXTRA_SELECT_COUNT,9);
+//                intent2.putExtra(SelecteImageActivity.EXTRA_SELECT_MODE,SelecteImageActivity.MODE_MULTI);
+//                intent2.putStringArrayListExtra(SelecteImageActivity.EXTRA_DEFAULT_SELECTED_LIST, mImageList);
+//                intent2.putExtra(SelecteImageActivity.EXTRA_SHOW_CAMERA, true);
+//                startActivityForResult(intent2,22);
+                //换一个封装性更好的写法
+                // 用可能SelectImageActivity 别人是看不到的只能用，中间搞一层不要让开发者关注太多
+                // 第一个只关注想要什么，良好的封装性，不要暴露太多
+                ImageSelector.create().count(9).multi().origin(mImageList)
+                        .showCamera(true).start(this,22);
                 break;
         }
 

@@ -5,6 +5,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,6 +14,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.xcp.baselibrary.ioc.BindView;
+import com.xcp.baselibrary.recycleview.RecycleViewDecoration;
+import com.xcp.baselibrary.utils.StatusBarUtils;
 import com.xcp.framelibrary.SkinBaseActivity;
 import com.xcp.neihan.adapter.SelectImageListAdapter;
 
@@ -176,6 +179,7 @@ public class SelecteImageActivity extends SkinBaseActivity {
                 initSelectNum();
             }
         });
+        recyclerView.addItemDecoration(new RecycleViewDecoration(this, RecycleViewDecoration.Style.GRIDLAYOUT_DECORATION,R.drawable.item_decoration));
     }
 
     private void initSelectNum() {
@@ -190,7 +194,7 @@ public class SelecteImageActivity extends SkinBaseActivity {
 
     @Override
     protected void initView() {
-
+        StatusBarUtils.setStatusBarColor(this, Color.parseColor("#ff261f1f"));
     }
 
     @Override
