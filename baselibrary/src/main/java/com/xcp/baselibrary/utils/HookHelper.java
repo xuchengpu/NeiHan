@@ -1,0 +1,151 @@
+package com.xcp.baselibrary.utils;
+
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+/**
+ * Created by 许成谱 on 2018/12/4 15:31.
+ * qq:1550540124
+ * 热爱生活每一天！
+ * 通过动态代理方式hook启动外部apk中的Activity,基于sdk26,版本不同成员变量名称会有所差异
+ */
+public class HookHelper {
+    private static final String EXTRA_ORIGIN_INTENT ="extra_origin_intent";
+    private final Class mProxyClass;//代理Activity，没什么具体作用，只是帮助我们目标Activity绕过manifest.xml检测。
+    private final Context mContext;
+
+    public HookHelper(Context context, Class proxyClass){
+        this.mContext=context.getApplicationContext();
+        this.mProxyClass=proxyClass;
+    }
+
+    /**
+     * 在系统检测manifest中是否注册前执行
+     * 目标：通过动态代理使系统一准备执行ActivityManager.getService().startActivity()方法时就进入我们设定的代理InvocationHandler中的invoke()方法中，我们在这里可以做一些比如替换intent的操作，来暂时绕过系统检查
+     * @throws Exception
+     */
+    public  void hookStartActivity() throws Exception {
+
+        //1、获取真正执行启动Activity核心方法的实例android.util.Singleton.mInstance
+        //获取ActivityManager里面的IActivityManagerSingleton（真正执行启动Activity的核心执行者）
+        Field singletonField = ActivityManager.class.getDeclaredField("IActivityManagerSingleton");
+        singletonField.setAccessible(true);
+        //获取值
+        Object singleton = singletonField.get(null);//它是静态的，所以它的参数可以传null
+        //获取single中的mInstance
+        Class<?> singletonClass = Class.forName("android.util.Singleton");
+        Field mInstanceField = singletonClass.getDeclaredField("mInstance");
+        mInstanceField.setAccessible(true);
+        Object mInstance = mInstanceField.get(singleton);
+
+        //2、动态代理,注意这个模式必须基于接口才能执行
+        Object newInstance =Proxy.newProxyInstance(HookHelper.class.getClassLoader(),
+                new Class[]{Class.forName("android.app.IActivityManager")},
+                new startActivityInvocationHandler(mInstance));
+
+        //3、设置给android.util.Singleton
+        mInstanceField.set(singleton,newInstance);
+
+    }
+
+    private  class startActivityInvocationHandler implements InvocationHandler {
+        private  Object mObject;//方法的执行者，被代理者
+
+        public startActivityInvocationHandler(Object object) {
+            this.mObject=object;
+        }
+
+        /**
+         * 通过这样一代理，使的所有要执行startactivity、 startService、getActivityOptions等方法都会走这里
+         * @param proxy
+         * @param method
+         * @param args
+         * @return
+         * @throws Throwable
+         */
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            // 替换Intent,过AndroidManifest.xml检测
+//            Log.e("InvocationHandler", method.getName());
+            if(method.getName().equals("startActivity")) {
+                //在这里做一些替换intent的操作
+
+//            .startActivity(whoThread, who.getBasePackageName(), intent,
+//                    intent.resolveTypeIfNeeded(who.getContentResolver()),
+//                    token, target != null ? target.mEmbeddedID : null,
+//                    requestCode, 0, null, options);
+                //可知第二个参数是intent
+                Intent originIntent  = (Intent) args[2];//原来的intent
+                Intent safeIntent=new Intent(mContext,mProxyClass);//new 一个新的安全的intent
+                safeIntent.putExtra(EXTRA_ORIGIN_INTENT,originIntent);//把原有的intent绑定到安全的intent上，方便后期绕过系统检测后再取出来跳转到真正的目标Activity中去
+                args[2]=safeIntent;//替换
+            }
+            return method.invoke(mObject,args);
+        }
+    }
+
+    /**
+     * 在已经通过Activity的manifest检测后执行，此时需要将目标Activity恢复过来 即在switch 中执行handleLaunchActivity（）前，要把record中的intent替换掉
+     * 这个方法里没有用动态代理，因为根据源码，可以给handler设置一个回调，它就没每次判断后自动执行回调了，没必要用动态代理
+     * @throws Exception
+     */
+    public void hookLunchActivity() throws Exception {
+        //1、拿到当前的活动启动线程，实际上它也只有一个
+        Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
+        Field currentActivityThreadFiled = activityThreadClass.getDeclaredField("sCurrentActivityThread");
+        currentActivityThreadFiled.setAccessible(true);
+        Object currentActivityThread = currentActivityThreadFiled.get(null);
+        //2、拿到当前线程中的mh,每次启动Activity时就是通过它来发消息进行的 见scheduleLaunchActivity()
+        Field mHField = activityThreadClass.getDeclaredField("mH");
+        mHField.setAccessible(true);
+        Object mH = mHField.get(currentActivityThread);
+        //3、给mh设置一个回调，使他每次执行的时候都能收到通知，以便执行替换intnet这一动作
+        Class<?> handlerClass = Class.forName("android.os.Handler");
+        Field callbackField = handlerClass.getDeclaredField("mCallback");
+        callbackField.setAccessible(true);
+        callbackField.set(mH,new HookHandlerCallback());
+    }
+
+    private class HookHandlerCallback implements Handler.Callback {
+        @Override
+        public boolean handleMessage(Message msg) {
+            // 每发一个消息都会走一次这个CallBack发放
+            //阅读源码可知，我们在启动Activity的时候才需要拦截处理，即msg.what==100时
+            if(msg.what==100) {
+                handleLunchActivity(msg);
+            }
+            return false;
+        }
+
+        /**
+         * 真正执行把intent改回来的方法
+         * @param msg
+         */
+        private void handleLunchActivity(Message msg)  {
+            //阅读scheduleLaunchActivity()方法可知，msg中封装了intent
+            Object record = msg.obj;
+            try {
+                //拿到我们设置的安全的intent
+                Field safeIntentField = record.getClass().getDeclaredField("intent");
+                safeIntentField.setAccessible(true);
+                Intent safeIntent = (Intent) safeIntentField.get(record);
+                //从中拿到我们原本的intent
+                Intent originIntent=(Intent)safeIntent.getParcelableExtra(EXTRA_ORIGIN_INTENT);
+                if(originIntent!=null) {
+                    //重新设置回去
+                    safeIntentField.set(record,originIntent);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}

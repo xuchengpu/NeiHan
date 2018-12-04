@@ -3,6 +3,7 @@ package com.xcp.neihan;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.util.Log;
@@ -35,6 +36,7 @@ import com.xcp.framelibrary.skin.SkinManager;
 import com.xcp.neihan.bean.HomeBean;
 import com.xcp.neihan.bean.Person;
 import com.xcp.neihan.utils.ImageSelector;
+import com.xcp.neihan.utils.ImageUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +44,12 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class MainActivity extends SkinBaseActivity {
+    static {
+        System.loadLibrary("hello");
+        //此处有问题，后期再改
+//        System.loadLibrary("jpeg");
+//        System.loadLibrary("compressimg");
+    }
 
     private static final int STORAGE_REQUEST = 1;
     @BindView(R.id.tv_hello)
@@ -56,6 +64,10 @@ public class MainActivity extends SkinBaseActivity {
     ImageView ivSkin;
     @BindView(R.id.btn_select_img)
     Button btnSelectImg;
+    @BindView(R.id.btn_compress_img)
+    Button btnCompressImg;
+    @BindView(R.id.btn_another_apk)
+    Button btnAnotherApk;
     private Drawable drawable;
     private ArrayList<String> mImageList;//已选定的图片
 
@@ -91,7 +103,7 @@ public class MainActivity extends SkinBaseActivity {
 
     @Override
     protected void initData() {
-        tvHello.setText("ioc注解");
+//        tvHello.setText("ioc注解");
         //插入数据
         ISupportDao<Person> dao = SupportDaoFactory.getInstance().getDao(Person.class);
 //        List<Person> personList = new ArrayList<>();
@@ -180,7 +192,11 @@ public class MainActivity extends SkinBaseActivity {
         PermissionHelper.with(this)
                 .permissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE})
                 .requestCode(STORAGE_REQUEST).request();
+
+        tvHello.setText(sayHello());
     }
+
+    private native String sayHello();
 
     private void initToolbar() {
         new DefaultTitleBar.Builder(this)
@@ -240,7 +256,7 @@ public class MainActivity extends SkinBaseActivity {
         return R.layout.activity_main;
     }
 
-    @OnClick({R.id.btn_select_img,R.id.btn_default_skin, R.id.btn_another, R.id.tv_hello, R.id.btn_change_skin})
+    @OnClick({R.id.btn_another_apk,R.id.btn_compress_img,R.id.btn_select_img, R.id.btn_default_skin, R.id.btn_another, R.id.tv_hello, R.id.btn_change_skin})
     @CheckNet
     private void onClick(View view) {
         switch (view.getId()) {
@@ -257,6 +273,30 @@ public class MainActivity extends SkinBaseActivity {
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.btn_compress_img:
+                // 把选择好的图片做了一下压缩
+                Bitmap bitmap = ImageUtil.decodeFile(mImageList.get(0));
+                // 调用写好的native方法
+                // 用Bitmap.compress压缩1/10
+                Log.e("TAG", "开始压缩");
+//                ImageUtil.compressImage(bitmap, 75,
+//                        getExternalFilesDir(null).getAbsolutePath() + File.separator +
+//                                new File(mImageList.get(0)).getName()
+//                );
+//                for (String path : mImageList) {
+//                    // 做优化  第一个decodeFile有可能会内存移除
+//                    // 一般后台会规定尺寸  800  小米 规定了宽度 720
+//                    // 上传的时候可能会多张 for循环 最好用线程池 （2-3）
+//                    Bitmap bitmap = ImageUtil.decodeFile(path);
+//                    // 调用写好的native方法
+//                    // 用Bitmap.compress压缩1/10
+//                    Log.e("TAG", "开始压缩");
+//                    ImageUtil.compressImage(bitmap, 75,
+//                            getExternalFilesDir(null).getAbsolutePath() + File.separator +
+//                                    new File(path).getName()
+//                    );
+//                }
+                break;
             case R.id.btn_select_img:
 //                Intent intent2 = new Intent(this, SelecteImageActivity.class);
 //                intent2.putExtra(SelecteImageActivity.EXTRA_SELECT_COUNT,9);
@@ -268,8 +308,13 @@ public class MainActivity extends SkinBaseActivity {
                 // 用可能SelectImageActivity 别人是看不到的只能用，中间搞一层不要让开发者关注太多
                 // 第一个只关注想要什么，良好的封装性，不要暴露太多
                 ImageSelector.create().count(9).multi().origin(mImageList)
-                        .showCamera(true).start(this,22);
+                        .showCamera(true).start(this, 22);
                 break;
+                case R.id.btn_another_apk:
+                    Intent intent2 = new Intent(this,UnRegisterActivity .class);
+                    intent2.putExtra("message","你猜猜猜猜猜猜");
+                    startActivity(intent2);
+                    break;
         }
 
     }
@@ -292,10 +337,10 @@ public class MainActivity extends SkinBaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode==RESULT_OK) {
-            if(requestCode==22&&data!=null) {
-                mImageList=data.getStringArrayListExtra(SelecteImageActivity.EXTRA_DEFAULT_SELECTED_LIST);
-                Log.e("TAG", "mImageList=="+mImageList.toString());
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 22 && data != null) {
+                mImageList = data.getStringArrayListExtra(SelecteImageActivity.EXTRA_DEFAULT_SELECTED_LIST);
+                Log.e("TAG", "mImageList==" + mImageList.toString());
             }
         }
     }

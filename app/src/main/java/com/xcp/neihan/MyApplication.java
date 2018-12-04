@@ -5,6 +5,7 @@ import android.app.Application;
 import com.alipay.euler.andfix.patch.PatchManager;
 import com.xcp.baselibrary.CrashHandler;
 import com.xcp.baselibrary.database.SupportDaoFactory;
+import com.xcp.baselibrary.utils.HookHelper;
 import com.xcp.framelibrary.skin.SkinManager;
 
 /**
@@ -23,6 +24,14 @@ public class MyApplication extends Application {
         CrashHandler.getInstance().init(this);//初始化崩溃收集类
         SupportDaoFactory.getInstance().init(this);//初始化自定义数据库
         SkinManager.getInstance().init(this); //换肤
+        try {
+            HookHelper helper=new HookHelper(this,ProxyActivity.class);
+            helper.hookStartActivity();//修改为代理类对应的安全intent绕过manifest.xml注册检查
+            helper.hookLunchActivity();//改回目标intent,使可以启动外部的apk中的Activity
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         //阿里热修复AndFix初始化
        /* patchManager = new PatchManager(this);
 
