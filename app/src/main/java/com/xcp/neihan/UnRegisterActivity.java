@@ -1,10 +1,14 @@
 package com.xcp.neihan;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-public class UnRegisterActivity extends Activity {
+/**
+ * 注意此处暂时只能继承Activity，回头再解决继承AppCompatActivity
+ *
+ */
+public class UnRegisterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
