@@ -31,7 +31,6 @@ public class MyApplication extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         //阿里热修复AndFix初始化
        /* patchManager = new PatchManager(this);
 

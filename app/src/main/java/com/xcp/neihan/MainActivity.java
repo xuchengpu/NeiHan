@@ -20,6 +20,7 @@ import com.xcp.baselibrary.database.ISupportDao;
 import com.xcp.baselibrary.database.SupportDaoFactory;
 import com.xcp.baselibrary.dialog.AlertDialog;
 import com.xcp.baselibrary.fix.FixManager;
+import com.xcp.baselibrary.fix.PluginManager;
 import com.xcp.baselibrary.http.HttpUtils;
 import com.xcp.baselibrary.http.OkHttpEngine;
 import com.xcp.baselibrary.ioc.BindView;
@@ -256,7 +257,7 @@ public class MainActivity extends SkinBaseActivity {
         return R.layout.activity_main;
     }
 
-    @OnClick({R.id.btn_another_apk,R.id.btn_compress_img,R.id.btn_select_img, R.id.btn_default_skin, R.id.btn_another, R.id.tv_hello, R.id.btn_change_skin})
+    @OnClick({R.id.btn_another_apk, R.id.btn_compress_img, R.id.btn_select_img, R.id.btn_default_skin, R.id.btn_another, R.id.tv_hello, R.id.btn_change_skin})
     @CheckNet
     private void onClick(View view) {
         switch (view.getId()) {
@@ -310,11 +311,21 @@ public class MainActivity extends SkinBaseActivity {
                 ImageSelector.create().count(9).multi().origin(mImageList)
                         .showCamera(true).start(this, 22);
                 break;
-                case R.id.btn_another_apk:
-                    Intent intent2 = new Intent(this,UnRegisterActivity .class);
-                    intent2.putExtra("message","你猜猜猜猜猜猜");
-                    startActivity(intent2);
-                    break;
+            case R.id.btn_another_apk:
+                //plugin 1、跳转到本页面未注册的Activity中
+//                Intent intent2 = new Intent(this, UnRegisterActivity.class);
+//                intent2.putExtra("message", "你猜猜猜猜猜猜");
+//                startActivity(intent2);
+                //plugin 2、跳转到外部apk中的Activity中 注意：切换功能时，需要在本类中注释掉这些：installPluginApk();
+                // 启动插件，插件下载好了在内存卡里面
+                Intent intent2 = new Intent();
+                // 目前启动肯定报错，类找不到  类怎么办？ 热修复应该能够找到解决方案
+                // dex 现在我们加载apk
+                intent2.setClassName(getPackageName(),
+                        "com.xcp.anothepluginrapk.MainActivity");
+                intent2.putExtra("message", "插件化开发");
+                startActivity(intent2);
+                break;
         }
 
     }
@@ -326,7 +337,14 @@ public class MainActivity extends SkinBaseActivity {
 
     @PermissionSucceed(requestCode = STORAGE_REQUEST)
     private void showSuccess() {
+       //加载外部apk插件类
+        installPluginApk();
         Toast.makeText(MainActivity.this, "存储权限申请成功", Toast.LENGTH_SHORT).show();
+    }
+
+    private void installPluginApk() {
+        String apkPath=Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"friend_plugin.apk";
+        PluginManager.install(this,apkPath);
     }
 
     @PermissionFailed(requestCode = STORAGE_REQUEST)

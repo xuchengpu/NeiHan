@@ -17,6 +17,7 @@ import java.lang.reflect.Proxy;
  * qq:1550540124
  * 热爱生活每一天！
  * 通过动态代理方式hook启动外部apk中的Activity,基于sdk26,版本不同成员变量名称会有所差异
+ * 注意这里有bug:会导致权限申请框弹不出来，后期解决
  */
 public class HookHelper {
     private static final String EXTRA_ORIGIN_INTENT ="extra_origin_intent";
@@ -163,26 +164,6 @@ public class HookHelper {
                         new sPackageManagerHandler(sPackageManager));
                 //4、把代理设置给currentActivityThread，代替原有的sPackageManager，使它每次执行getActivityInfo方法时都能被加工一下
                 sPackageManagerField.set(currentActivityThread,proxy);
-
-
-
-//                Class<?> forName = Class.forName("android.app.ActivityThread");
-//                Field field = forName.getDeclaredField("sCurrentActivityThread");
-//                field.setAccessible(true);
-//                Object activityThread = field.get(null);
-//                // 我自己执行一次那么就会创建PackageManager，系统再获取的时候就是下面的iPackageManager
-//                Method getPackageManager = activityThread.getClass().getDeclaredMethod("getPackageManager");
-//                Object iPackageManager = getPackageManager.invoke(activityThread);
-//
-//                PackageManagerHandler handler = new PackageManagerHandler(iPackageManager);
-//                Class<?> iPackageManagerIntercept = Class.forName("android.content.pm.IPackageManager");
-//                Object proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-//                        new Class<?>[]{iPackageManagerIntercept}, handler);
-//
-//                // 获取 sPackageManager 属性
-//                Field iPackageManagerField = activityThread.getClass().getDeclaredField("sPackageManager");
-//                iPackageManagerField.setAccessible(true);
-//                iPackageManagerField.set(activityThread, proxy);
             } catch (Exception e) {
                 e.printStackTrace();
             }
