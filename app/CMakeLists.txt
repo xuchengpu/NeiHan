@@ -3,16 +3,21 @@ cmake_minimum_required(VERSION 3.4.1)
 
 add_library( # Specifies the name of the library.
 # 这里是你so的名字。刚才在 MainActivity里面要引用的
-             hello
+             image_util
 
              # Sets the library as a shared library.
              SHARED
 
              # Provides a relative path to your source file(s).
               #这里是刚才 创建的c++ 代码的名字
-             src/main/cpp/Hello.cpp )
-
-#add_library( compressimg SHARED src/main/cpp/compress_image.cpp)
+             src/main/cpp/ImageUtils.cpp
+             src/main/cpp/Hello.cpp
+             )
+add_library(
+             patch
+             SHARED
+             src/main/cpp/patch/bspatch.c
+             )
 
 find_library( # Sets the name of the path variable.
               log-lib
@@ -23,8 +28,11 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
 # 这里是你so的名字。刚才在 MainActivity里面要引用的 一样。
-                       hello
+                       image_util
 
                        # Links the target library to the log library
                        # included in the NDK.
+                       ${log-lib} )
+target_link_libraries(
+                       patch
                        ${log-lib} )

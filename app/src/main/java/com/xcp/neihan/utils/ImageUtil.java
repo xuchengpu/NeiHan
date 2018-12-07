@@ -61,4 +61,5 @@ public class ImageUtil {
 
         return BitmapFactory.decodeFile(path,options);
     }
+    public native static String getMessage();
 }

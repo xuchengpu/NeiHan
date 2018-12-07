@@ -44,6 +44,16 @@
 
         <activity android:name=".SelecteImageActivity" />
         <activity android:name=".ProxyActivity" />
+
+        <provider
+            android:name=".MyFileProvider"
+            android:authorities="com.xcp.neihan.fileprovider"
+            android:enabled="true"
+            android:exported="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
     </application>
 
 </manifest>

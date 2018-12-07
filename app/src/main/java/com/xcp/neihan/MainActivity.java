@@ -36,8 +36,10 @@ import com.xcp.framelibrary.SkinBaseActivity;
 import com.xcp.framelibrary.skin.SkinManager;
 import com.xcp.neihan.bean.HomeBean;
 import com.xcp.neihan.bean.Person;
+import com.xcp.neihan.utils.ApkUtil;
 import com.xcp.neihan.utils.ImageSelector;
 import com.xcp.neihan.utils.ImageUtil;
+import com.xcp.neihan.utils.PatchUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,10 +48,8 @@ import java.util.Map;
 
 public class MainActivity extends SkinBaseActivity {
     static {
-        System.loadLibrary("hello");
-        //此处有问题，后期再改
-//        System.loadLibrary("jpeg");
-//        System.loadLibrary("compressimg");
+        System.loadLibrary("image_util");
+        System.loadLibrary("patch");
     }
 
     private static final int STORAGE_REQUEST = 1;
@@ -71,6 +71,12 @@ public class MainActivity extends SkinBaseActivity {
     Button btnAnotherApk;
     private Drawable drawable;
     private ArrayList<String> mImageList;//已选定的图片
+
+    private String mPatchPath = Environment.getExternalStorageDirectory().getAbsolutePath()
+            +File.separator+"version_1.0_2.0.patch";
+
+    private String mNewApkPath = Environment.getExternalStorageDirectory().getAbsolutePath()
+            +File.separator+"Version2.0.apk";
 
     @Override
     protected void initListener() {
@@ -194,7 +200,33 @@ public class MainActivity extends SkinBaseActivity {
                 .permissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE})
                 .requestCode(STORAGE_REQUEST).request();
 
-        tvHello.setText(sayHello());
+        tvHello.setText(sayHello()+"\n"+ImageUtil.getMessage());
+        checkUpdate();
+    }
+
+    /**
+     * 检查更新
+     */
+    private void checkUpdate() {
+        // 1.访问后台接口，需不需要更新版本
+
+        // 2.需要更新版本，那么提示用需要下载 （腾讯视频）,
+        //   直接下载，然后提示用户更新
+
+        // 3.下载完差分包之后，调用我们的方法去合并生成新的apk
+        // 是一个耗时操作，怎么弄 开线程+，Handler, AsyncTask , RXJava
+        // 本地apk路径怎么来，已经被安装了  1.0
+        // 获取本地的getPackageResourcePath()apk路径
+        if(!new File(mPatchPath).exists()){
+            return;
+        }
+        PatchUtil.combine(getPackageResourcePath(),mNewApkPath,mPatchPath);
+
+        // 4.需要校验签名    就是获取本地apk的签名，与我们新版本的apk作对比
+        // 怎么获取2.0版本apk的签名  百度 灵感 系统是不是会校验，系统的安装apk那个应用看它是怎么校验的
+
+        // 5.安装最新版本 (网上搜索怎么安装apk)
+        ApkUtil.installApp(this,mNewApkPath);
     }
 
     private native String sayHello();
