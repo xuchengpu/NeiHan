@@ -10,6 +10,7 @@ import java.util.List;
  * Created by 许成谱 on 2018/11/2 16:42.
  * qq:1550540124
  * 热爱生活每一天！
+ * 这个地方可以根据开闭原则用面向接口编程的思想，去实现一个接口，提高扩展性
  */
 public class CacheUtils {
     public static String getCache(String mUrlKey) {

@@ -80,7 +80,6 @@ public class MainActivity extends SkinBaseActivity {
 
     @Override
     protected void initListener() {
-
     }
 
     private void showMyDialog() {

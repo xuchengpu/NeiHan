@@ -3,10 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NeiHan.iml" filepath="$PROJECT_DIR$/NeiHan.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/baselibrary/baselibrary.iml" filepath="$PROJECT_DIR$/baselibrary/baselibrary.iml" />
-      <module fileurl="file://$PROJECT_DIR$/client/client.iml" filepath="$PROJECT_DIR$/client/client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/framelibrary/framelibrary.iml" filepath="$PROJECT_DIR$/framelibrary/framelibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/NeiHan.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/NeiHan.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/baselibrary/NeiHan.baselibrary.iml" filepath="$PROJECT_DIR$/.idea/modules/baselibrary/NeiHan.baselibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/client/NeiHan.client.iml" filepath="$PROJECT_DIR$/.idea/modules/client/NeiHan.client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/framelibrary/NeiHan.framelibrary.iml" filepath="$PROJECT_DIR$/.idea/modules/framelibrary/NeiHan.framelibrary.iml" />
     </modules>
   </component>
 </project>
